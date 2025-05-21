@@ -167,7 +167,8 @@ class App {
                 documentCSS: this.cliArguments['embedded-styles']? documentCSS : '',
                 embeddedImages: this.cliArguments['embedded-images'],
                 comments: this.cliArguments['comments'],
-                docx: this.cliArguments['docx']
+                docx: this.cliArguments['docx'],
+                destinationFolder: this.desinationFolder
             });
 
         this.quipProcessor.setLogger(this.Logger);
