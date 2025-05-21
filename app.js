@@ -39,18 +39,33 @@ class App {
     /*
     callback-function for file saving
     */
-    fileSaver(data, fileName, type, filePath) {
+    async fileSaver(data, fileName, type, relPath, created_usec, updated_usec) {
+        const filePath = path.join(this.desinationFolder, 'quip-export', relPath, fileName);
+        const dir = path.dirname(filePath);
+        fs.mkdirSync(dir, { recursive: true });
+
         if(type === 'BLOB') {
             if(this.cliArguments.zip) {
-                this.zip.folder(filePath).file(fileName, data.arrayBuffer());
+                this.zip.folder(relPath).file(fileName, data.arrayBuffer());
             } else {
-                utils.writeBlobFile(path.join(this.desinationFolder, "quip-export", filePath, fileName), data);
+                await utils.writeBlobFile(filePath, data);
             }
         } else {
             if(this.cliArguments.zip) {
-                this.zip.folder(filePath).file(fileName, data);
+                this.zip.folder(relPath).file(fileName, data);
             } else {
-                utils.writeTextFile(path.join(this.desinationFolder, "quip-export", filePath, fileName), data);
+                utils.writeTextFile(filePath, data);
+            }
+        }
+
+        // Set timestamps if provided
+        if (created_usec && updated_usec) {
+            const atime = new Date(created_usec / 1000); // microseconds to milliseconds
+            const mtime = new Date(updated_usec / 1000);
+            try {
+                await fs.promises.utimes(filePath, atime, mtime);
+            } catch (err) {
+                console.error(`Failed to set timestamps for ${filePath}:`, err);
             }
         }
     }
