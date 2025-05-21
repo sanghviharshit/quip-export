@@ -63,6 +63,8 @@ class App {
             const atime = new Date(created_usec / 1000); // microseconds to milliseconds
             const mtime = new Date(updated_usec / 1000);
             try {
+                // atime is the creation time, mtime is the modification time
+                // but atime is useless because fs will update it to current time anyway. TODO: remove atime
                 await fs.promises.utimes(filePath, atime, mtime);
             } catch (err) {
                 console.error(`Failed to set timestamps for ${filePath}:`, err);
